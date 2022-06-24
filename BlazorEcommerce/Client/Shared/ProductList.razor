@@ -20,7 +20,7 @@ else
                     <a href="/product/@product.Id">
                         <h4 class="mb-0">@product.Title</h4>
                     </a>
-                    <p>@product.Description</p> 
+                    <p>@product.Description</p>
                     <h5 class="price">
                         @GetPriceText(product)
                     </h5>
@@ -28,6 +28,13 @@ else
             </li>
         }
     </ul>
+    for (var i = 1; i <= ProductService.PageCount; i++)
+    {
+        <a class="btn
+                @(i == ProductService.CurrentPage ? "btn-info" : "btn-outline-info")
+                page-selection"
+                href="/search/@ProductService.LastSearchText/@i">@i</a>
+    }
 }
 
 @code {

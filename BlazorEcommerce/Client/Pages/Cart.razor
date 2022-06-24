@@ -12,15 +12,16 @@
 else
 {
     <div>
-        @foreach(var product in cartProducts)
+        @foreach (var product in cartProducts)
         {
             <div class="container">
                 <div class="image-wrapper">
-                    <img src="@product.ImageUrl" class="image"/>
+                    <img src="@product.ImageUrl" class="image" />
                 </div>
                 <div class="name">
                     <h5><a href="/product/@product.ProductId">@product.Title</a></h5>
-                    <span>@product.ProductType</span>
+                    <span>@product.ProductType</span><br />
+                    <button class="btn-delete" @onclick="@(() => RemoveProductFromCart(product.ProductId, product.ProductTypeId))">Delete</button>
                 </div>
                 <div class="cart-product-price">$@product.Price</div>
             </div>
@@ -37,7 +38,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if((await CartService.GetCartItems()).Count == 0)
+        await LoadCart();
+    }
+
+    private async Task RemoveProductFromCart(int productId, int productTypeId)
+    {
+        await CartService.RemoveProductFromCart(productId, productTypeId);
+        await LoadCart();
+    }
+
+    private async Task LoadCart()
+    {
+        if ((await CartService.GetCartItems()).Count == 0)
         {
             message = "Your cart is empty.";
             cartProducts = new List<CartProductResponse>();

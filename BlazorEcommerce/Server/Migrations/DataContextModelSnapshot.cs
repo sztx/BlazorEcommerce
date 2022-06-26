@@ -433,7 +433,7 @@ namespace BlazorEcommerce.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("BlazorEcommerce.Shared.Product", b =>

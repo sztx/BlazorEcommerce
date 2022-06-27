@@ -16,13 +16,13 @@
                 Data = new List<CartProductResponse>()
             };
 
-            foreach(var item in cartItems)
+            foreach (var item in cartItems)
             {
                 var product = await _context.Products
                     .Where(p => p.Id == item.ProductId)
                     .FirstOrDefaultAsync();
 
-                if(product == null)
+                if (product == null)
                 {
                     continue;
                 }
@@ -33,7 +33,7 @@
                     .Include(v => v.ProductType)
                     .FirstOrDefaultAsync();
 
-                if(productVariant == null)
+                if (productVariant == null)
                 {
                     continue;
                 }
@@ -53,6 +53,15 @@
             }
 
             return result;
+        }
+
+        public async Task<ServiceResponse<List<CartProductResponse>>> StoreCartItems(List<CartItem> cartItems, int userId)
+        {
+            cartItems.ForEach(cartItem => cartItem.UserId = userId);
+            _context.CartItems.AddRange(cartItems);
+            await _context.SaveChangesAsync();
+
+            return await GetCartProducts(await _context.CartItems.Where(ci => ci.UserId == userId).ToListAsync());
         }
     }
 }

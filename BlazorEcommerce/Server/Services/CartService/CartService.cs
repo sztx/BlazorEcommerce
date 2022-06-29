@@ -12,7 +12,7 @@ namespace BlazorEcommerce.Server.Services.CartService
             _context = context;
             _authService = authService;
         }
-        
+
         public async Task<ServiceResponse<List<CartProductResponse>>> GetCartProducts(List<CartItem> cartItems)
         {
             var result = new ServiceResponse<List<CartProductResponse>>
@@ -74,9 +74,14 @@ namespace BlazorEcommerce.Server.Services.CartService
             return new ServiceResponse<int> { Data = count };
         }
 
-        public async Task<ServiceResponse<List<CartProductResponse>>> GetDBCartProducts()
+        public async Task<ServiceResponse<List<CartProductResponse>>> GetDBCartProducts(int? userId = null)
         {
-            return await GetCartProducts(await _context.CartItems.Where(ci => ci.UserId == _authService.GetUserId()).ToListAsync());
+            if (userId == null)
+            {
+                userId = _authService.GetUserId();
+            }
+
+            return await GetCartProducts(await _context.CartItems.Where(ci => ci.UserId == userId).ToListAsync());
         }
 
         public async Task<ServiceResponse<bool>> AddToCart(CartItem cartItem)

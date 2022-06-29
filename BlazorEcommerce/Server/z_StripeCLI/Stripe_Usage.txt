@@ -1,4 +1,6 @@
 ﻿1. Open prompt to folder containg stripe.exe. ex. C:\Users\CS\RiderProjects\BlazorEcommerce\BlazorEcommerce\Server\z_StripeCLI
 2. Run stripe listen --forward-to https://localhost:7283/api/payment (substitue port for current working port).
 
+The wecbook secret only lasts 90 days then must be regenerated with running stripe login and placed in paymentservices.cs
+
 current webhook secret whsec_e98281af383bab5ca44abae47890ed37061ff53927e48b668bf25be43972cb43

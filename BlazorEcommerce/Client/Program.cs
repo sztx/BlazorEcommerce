@@ -1,3 +1,4 @@
+global using BlazorEcommerce.Client.Services.AddressService;
 global using BlazorEcommerce.Client.Services.AuthService;
 global using BlazorEcommerce.Client.Services.CartService;
 global using BlazorEcommerce.Client.Services.CategoryService;
@@ -23,6 +24,7 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 //Register Services for Dependency Injection
+builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();

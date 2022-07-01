@@ -8,6 +8,7 @@ global using BlazorEcommerce.Client.Services.OrderService;
 global using BlazorEcommerce.Shared;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using System.Net.Http.Json;
+global using MudBlazor.Services;
 
 using BlazorEcommerce.Client;
 using Blazored.LocalStorage;
@@ -21,6 +22,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 //Register Blazored Local Storage
 builder.Services.AddBlazoredLocalStorage();
+
+builder.Services.AddMudServices();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

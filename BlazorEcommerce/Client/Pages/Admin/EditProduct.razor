@@ -1,9 +1,5 @@
 ﻿@page "/admin/product"
 @page "/admin/product/{id:int}"
-@using Microsoft.VisualBasic
-@using System.Runtime.InteropServices
-@using System.Runtime.InteropServices.ComTypes
-@using Microsoft.Extensions.Options
 @inject IProductService ProductService
 @inject IProductTypeService ProductTypeService
 @inject ICategoryService CategoryService
@@ -35,9 +31,34 @@ else
             <label for="imageUrl">Image Url</label>
             <InputText id="imageUrl" @bind-Value="product.ImgURL" class="form-control"></InputText>
         </div>
-        <dir class="mb-0">
-            <img src="@product.ImgURL" />
-        </dir>
+        <div class="mb-0" style="display: flex; flex-wrap: wrap; flex-direction: row; justify-content: center;">
+            @if (!string.IsNullOrEmpty(product.ImgURL))
+            {
+                <img src="@product.ImgURL" />
+            }
+            else
+            {
+                foreach (var image in product.Images)
+                {
+                    <MudCard Class="ma-2">
+                        <MudCardContent>
+                            <MudImage Src="@image.Data" />
+                        </MudCardContent>
+                        <MudCardActions Style="justify-content: center;">
+                            <MudButton Variant="Variant.Filled"
+                           Color="Color.Error"
+                           OnClick="@(() => RemoveImage(image.Id))">
+                                Remove
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                }
+            }
+        </div>
+        <div class="mb-0">
+            <label for="images">Image(s)</label>
+            <InputFile id="images" OnChange="OnFileChange" multiple class="form-control"></InputFile>
+        </div>
         <div class="mb-0">
             <label for="description">Description</label>
             <InputTextArea id="description" @bind-Value="product.Description" class="form-control"></InputTextArea>
@@ -68,7 +89,7 @@ else
             <InputNumber @bind-Value="variant.OriginalPrice" class="form-control" disabled="@variant.Deleted"></InputNumber>
         </div>
         <div class="col col-visible">
-            <InputCheckbox @bind-Value="variant.Visible" style="transform:scale(1.5,1.5)" disabled="@variant.Deleted"></InputCheckbox>
+            <InputCheckbox @bind-Value="variant.Visible" style="transform:scale(1.5,1.5);" disabled="@variant.Deleted"></InputCheckbox>
         </div>
         <div class="col">
             <button type="button" class="btn btn-primary" disabled="@variant.Deleted" @onclick="@(() => RemoveVariant(variant.ProductTypeId))">
@@ -80,6 +101,7 @@ else
         <button type="button" class="btn btn-primary" @onclick="AddVariant">
             <i class="oi oi-plus"></i> Add Variant
         </button>
+        <hr />
         <div class="mb-0">
             <label for="category">Category</label>
             <InputSelect id="category" @bind-Value="product.CategoryId" class="form-control">
@@ -136,18 +158,15 @@ else
         else
         {
             Product dbProduct = (await ProductService.GetProduct(Id)).Data;
-
             if (dbProduct == null)
             {
                 msg = $"Product with Id '{Id}' does not exist!";
                 return;
             }
-
             product = dbProduct;
             product.Editing = true;
             btnText = "Update Product";
         }
-
         loading = false;
     }
 
@@ -199,4 +218,27 @@ else
             NavigationManager.NavigateTo("admin/products");
         }
     }
+
+    async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        foreach (var image in e.GetMultipleFiles(int.MaxValue))
+        {
+            var resizedImage = await image.RequestImageFileAsync(format, 200, 200);
+            var buffer = new byte[resizedImage.Size];
+            await resizedImage.OpenReadStream().ReadAsync(buffer);
+            var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            product.Images.Add(new Image { Data = imageData });
+        }
+    }
+
+    void RemoveImage(int id)
+    {
+        var image = product.Images.FirstOrDefault(i => i.Id == id);
+        if (image != null)
+        {
+            product.Images.Remove(image);
+        }
+    }
 }
+
